@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>إدارة أُرزق (خاص)</title>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,Tahoma,sans-serif;background:#062443;color:#fff;padding:24px 18px}
+.c{max-width:420px;margin:0 auto}
+h1{font-size:24px;margin:0 0 6px}
+p{color:#D5DEEC;font-size:14px;line-height:1.8;margin:0 0 14px}
+input{width:100%;box-sizing:border-box;border:0;border-radius:12px;padding:14px;font-size:20px;text-align:center;direction:ltr;letter-spacing:2px;text-transform:uppercase;color:#062443;margin-bottom:10px}
+button{width:100%;border:0;border-radius:12px;padding:14px;font-size:16px;font-weight:700;color:#fff;background:#F58220;margin-bottom:10px}
+button.g{background:#1FAF5A} button.b{background:#17446C}
+#out{word-break:break-all;direction:ltr;background:#ffffff1f;border-radius:12px;padding:12px;font-size:13px;margin-bottom:10px;display:none}
+#m{color:#FFD2A8;font-size:13px;min-height:20px}
+.w{background:#C83D3D;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:16px}
+</style></head><body><div class="c">
+<h1>لوحة موافقتك على أُرزق</h1>
+<div class="w">خاصة بك فقط. لا ترفع هذا الملف إلى GitHub ولا تشاركه مع أحد.</div>
+<p>الصق رمز جهاز الزائر (مثل K7F2-9QXM) لتحصل على رمز التفعيل الخاص به.</p>
+<input id="d" placeholder="XXXX-XXXX" autocomplete="off">
+<button id="go" type="button">إنشاء رمز الموافقة</button>
+<div id="out"></div>
+<button class="g" id="wa" type="button" style="display:none">إرسال الرمز واتساب</button>
+<button class="b" id="cp" type="button" style="display:none">نسخ الرمز</button>
+<div id="m" role="status"></div>
+</div>
+<script>
+var PRIV={"key_ops":["sign"],"ext":true,"kty":"EC","x":"ivxTu1DURc0qglTBn4KnAlIcFAp8mvXqb7i5_Twt78g","y":"QDVF0txsEWae3V4sYVsyiSrNAHO5o2sMFtpCRcPHeIg","crv":"P-256","d":"cq37kZ6h9-sfuPKoQz_mi0dHbqujto9PL-d5FM9v6lc"};
+var code="";
+function b64u(buf){var u=new Uint8Array(buf),s="";for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+document.getElementById("go").onclick=function(){
+  var d=document.getElementById("d").value.trim().toUpperCase(),m=document.getElementById("m");
+  if(!/^[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(d)){m.textContent="الرمز يجب أن يكون بصيغة XXXX-XXXX";return}
+  crypto.subtle.importKey("jwk",PRIV,{name:"ECDSA",namedCurve:"P-256"},false,["sign"]).then(function(k){
+    return crypto.subtle.sign({name:"ECDSA",hash:"SHA-256"},k,new TextEncoder().encode(d));
+  }).then(function(sig){
+    code=b64u(sig);
+    var o=document.getElementById("out");o.textContent=code;o.style.display="block";
+    document.getElementById("wa").style.display="block";document.getElementById("cp").style.display="block";
+    m.textContent="تمت الموافقة على الجهاز "+d;
+  },function(){m.textContent="تعذّر إنشاء الرمز. افتح الملف في Safari أو Chrome"});
+};
+document.getElementById("cp").onclick=function(){navigator.clipboard.writeText(code).then(function(){document.getElementById("m").textContent="تم النسخ"})};
+document.getElementById("wa").onclick=function(){window.open("https://wa.me/?text="+encodeURIComponent(code),"_blank")};
+</script></body></html>
